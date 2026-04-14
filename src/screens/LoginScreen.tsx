@@ -22,7 +22,6 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoArea}>
-       source={require('../../assets/images/logo.png')} 
         <Image 
           source={require('../../assets/images/logo.png')} 
           style={styles.logoImage}
