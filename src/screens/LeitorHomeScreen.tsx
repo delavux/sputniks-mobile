@@ -1,53 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../App';
+import { Noticia, getNoticiasPublicadas } from '../data/noticiasDB';
 
-interface Noticia {
-  id: string;
-  titulo: string;
-  resumo: string;
-  categoria: string;
-  tempoLeitura: string;
-}
-
-const noticias: Noticia[] = [
-  {
-    id: '1',
-    titulo: 'Industria Nacional Atinge Meta Historica',
-    resumo: 'A producao industrial superou todas as expectativas neste trimestre, demonstrando a forca do trabalho coletivo...',
-    categoria: 'ECONOMIA',
-    tempoLeitura: '3 min'
-  },
-  {
-    id: '2',
-    titulo: 'Cientistas Desenvolvem Nova Tecnologia Agricola',
-    resumo: 'Pesquisadores anunciam metodo revolucionario para aumentar a produtividade no campo...',
-    categoria: 'CIENCIA',
-    tempoLeitura: '4 min'
-  },
-  {
-    id: '3',
-    titulo: 'Campeonato Nacional Define Finalistas',
-    resumo: 'As equipes mais disciplinadas avancam para a grande final apos partidas exemplares...',
-    categoria: 'ESPORTE',
-    tempoLeitura: '2 min'
-  },
-  {
-    id: '4',
-    titulo: 'Novo Programa Cultural Alcanca Milhoes',
-    resumo: 'Iniciativa de educacao artistica beneficia trabalhadores em todas as regioes do pais...',
-    categoria: 'CULTURA',
-    tempoLeitura: '5 min'
-  },
-  {
-    id: '5',
-    titulo: 'Avancos na Construcao de Moradias Populares',
-    resumo: 'Projeto habitacional entrega novas unidades e fortalece o direito a moradia digna...',
-    categoria: 'SOCIEDADE',
-    tempoLeitura: '3 min'
-  }
-];
+type LeitorHomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Leitor'>;
 
 const LeitorHomeScreen = () => {
+  const [noticias, setNoticias] = useState<Noticia[]>([]);
+  const navigation = useNavigation<LeitorHomeScreenNavigationProp>();
+
+  // Atualiza a lista sempre que a tela recebe foco
+  useFocusEffect(
+  React.useCallback(() => {
+    const carregar = async () => {
+      const dados = await getNoticiasPublicadas();
+      setNoticias(dados);
+    };
+    carregar();
+  }, [])
+);
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -74,19 +47,24 @@ const LeitorHomeScreen = () => {
       </View>
 
       <View style={styles.content}>
-        {noticias.map((noticia) => (
-          <TouchableOpacity key={noticia.id} style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.categoria}>{noticia.categoria}</Text>
-              <Text style={styles.tempoLeitura}>{noticia.tempoLeitura}</Text>
-            </View>
-            <Text style={styles.titulo}>{noticia.titulo}</Text>
-            <Text style={styles.resumo}>{noticia.resumo}</Text>
-            <View style={styles.cardFooter}>
-              <Text style={styles.lerMais}>Ler informe completo →</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {noticias.length === 0 ? (
+          <Text style={styles.vazioText}>Nenhuma noticia publicada ainda.</Text>
+        ) : (
+          noticias.map((noticia) => (
+            <TouchableOpacity key={noticia.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.categoria}>{noticia.categoria}</Text>
+                <Text style={styles.tempoLeitura}>{noticia.tempoLeitura}</Text>
+              </View>
+              <Text style={styles.titulo}>{noticia.titulo}</Text>
+              <Text style={styles.resumo}>{noticia.resumo}</Text>
+              <View style={styles.cardFooter}>
+                <Text style={styles.autorInfo}>Por {noticia.autorNome} • {noticia.dataPublicacao}</Text>
+                <Text style={styles.lerMais}>Ler informe completo →</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
       </View>
       
       <View style={styles.footer}>
@@ -161,6 +139,14 @@ const styles = StyleSheet.create({
   content: {
     padding: 15,
   },
+  vazioText: {
+    color: '#8B7355',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 40,
+    fontSize: 14,
+    letterSpacing: 1,
+  },
   card: {
     backgroundColor: '#2A2A2A',
     marginBottom: 15,
@@ -205,6 +191,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#8B7355',
     paddingTop: 12,
+  },
+  autorInfo: {
+    color: '#8B7355',
+    fontSize: 11,
+    fontStyle: 'italic',
+    marginBottom: 5,
   },
   lerMais: {
     color: '#B8860B',

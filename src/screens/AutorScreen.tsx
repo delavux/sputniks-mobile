@@ -14,6 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
+import { adicionarNoticia, gerarId, Noticia } from '../data/noticiasDB';
 
 type AutorScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Autor'>;
 
@@ -26,28 +27,38 @@ const AutorScreen = () => {
 
   const categorias = ['Economia', 'Ciencia', 'Esporte', 'Cultura', 'Sociedade', 'Politica'];
 
-  const handlePublicar = () => {
-    if (!titulo || !categoria || !conteudo || !resumo) {
-      Alert.alert('Atencao', 'Todos os campos sao obrigatorios!');
-      return;
-    }
+  const handlePublicar = async () => {
+  if (!titulo || !categoria || !conteudo || !resumo) {
+    Alert.alert('Atencao', 'Todos os campos sao obrigatorios!');
+    return;
+  }
 
-    Alert.alert(
-      'Informe Enviado',
-      'Seu artigo foi encaminhado para revisao do Conselho Editorial.',
-      [
-        {
-          text: 'Confirmar',
-          onPress: () => {
-            setTitulo('');
-            setCategoria('');
-            setConteudo('');
-            setResumo('');
-          },
-        },
-      ]
-    );
+  const novaNoticia: Noticia = {
+    id: gerarId(),
+    titulo,
+    resumo,
+    categoria,
+    conteudo,
+    autorNome: 'Redator Oficial',
+    dataPublicacao: new Date().toLocaleDateString('pt-BR'),
+    status: 'publicado',
+    tempoLeitura: `${Math.ceil(conteudo.split(' ').length / 200)} min`
   };
+
+  await adicionarNoticia(novaNoticia);
+
+  Alert.alert('Publicado!', 'Noticia salva com sucesso.', [
+    {
+      text: 'OK',
+      onPress: () => {
+        setTitulo('');
+        setCategoria('');
+        setConteudo('');
+        setResumo('');
+      }
+    }
+  ]);
+};
 
   return (
     <KeyboardAvoidingView

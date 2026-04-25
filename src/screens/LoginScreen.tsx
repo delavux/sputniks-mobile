@@ -22,6 +22,7 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoArea}>
+        {/* Substitua o caminho pela sua imagem */}
         <Image 
           source={require('../../assets/images/logo.png')} 
           style={styles.logoImage}

@@ -18,8 +18,6 @@ const DetalheNoticiaScreen = () => {
   const navigation = useNavigation<DetalheNoticiaScreenNavigationProp>();
   const route = useRoute();
   
-  // Aqui você receberia os dados da notícia via parâmetros
-  // const { noticia } = route.params;
 
   const handleShare = async () => {
     try {
